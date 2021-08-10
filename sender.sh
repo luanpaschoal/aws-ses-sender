@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Created on 2019.08.10
-# Update on 2019.08.10 23pm
+# Update on 2021.08.10
 # Aim: Send email with attachment from AWS SES
 # Coder : baturorkun@hmail.com / Batur Orkun
+# Update by Alastair Bor
 
 ## Global vars
 
@@ -47,7 +48,7 @@ function sendMail() {
         FILENAME="Message.txt"
     else
         FILENAME=$(basename "${ATTACHMENT%}")
-        ATTACHMENT=`base64 -i $ATTACHMENT`
+        ATTACHMENT=`base64 -e $ATTACHMENT`
     fi
 
     TEMPLATE="ses-email-template.json"
@@ -62,8 +63,9 @@ function sendMail() {
     sed -i -e "s/{BODY}/$BODY/g" $TMPFILE
     sed -i -e "s/{FILENAME}/$FILENAME/g" $TMPFILE
     sed -i -e "s/{ATTACHMENT}/$ATTACHMENT/g" $TMPFILE
+    sed -i -e "s/$(printf '\r')//g" $TMPFILE
 
-    aws ses send-raw-email --raw-message file://$TMPFILE
+    aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://$TMPFILE
 }
 
 while :; do
