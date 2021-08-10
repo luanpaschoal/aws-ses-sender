@@ -1,10 +1,13 @@
 #!/bin/bash
 
 # Created on 2019.08.10
-# Update on 2021.08.10
 # Aim: Send email with attachment from AWS SES
 # Coder : baturorkun@hmail.com / Batur Orkun
-# Update by Alastair Bor
+
+# Modifications by Alastair Bor
+# Removed setting aws region/id/key which can be done separately
+# Rewritten to allow for larger attachments (AWS limit is 10MB)
+# Removed the need to have a separate template file
 
 ## Global vars
 
@@ -15,9 +18,6 @@ function usage() {
         [-r|--receiver|--receivers <emails> coma seperated emails ]
         [-b|--body <string> ]
         [-a|--attachment <filename> filepath ]
-        [--aws-region <string> Change Default AWS Region ]
-        [--aws_access_key_id <string> Change AWS Access Key ID ]
-        [--aws_secret_access_key <string> Change AWS Secret Access Key ]
         " 1>&2;
     exit 1;
 }
@@ -31,7 +31,7 @@ function checkRequirements() {
 
     which  aws
     if [ $? -ne 0 ]; then
-        Error "AWS Cli tool is installed"
+        Error "AWS cli tool is installed"
     fi
 
     which  base64
@@ -42,6 +42,9 @@ function checkRequirements() {
 
 
 function sendMail() {
+    PARTA="{\"Data\": \"From: {FROM}\nTo: {RECVS}\nSubject: {SUBJECT}\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\\\"NextPart\\\"\\n\\n--NextPart\\nContent-Type: text/plain\\nContent-Transfer-Encoding: base64\\n\\n{BODY}\\n\\n--NextPart\\nContent-Type: text/plain;\\nContent-Disposition: attachment; filename=\\\"{FILENAME}\\\"\\nContent-Transfer-Encoding: base64\\n\\n"
+
+	PARTB="\\n\\n--NextPart--\"}"
 
     if [[ -z ${ATTACHMENT} ]]; then
         ATTACHMENT=$BODY
@@ -51,19 +54,19 @@ function sendMail() {
         ATTACHMENT=`base64 -e $ATTACHMENT`
     fi
 
-    TEMPLATE="ses-email-template.json"
-
     TMPFILE="/tmp/ses-$(date +%s)"
+	
+	printf "%s" $PARTA > $TMPFILE
+    printf "%s" $ATTACHMENT >> $TMPFILE
+    printf "%s" $PARTB >> $TMPFILE
 
-    cp $TEMPLATE $TMPFILE
-
-    sed -i -e "s/{SUBJECT}/$SUBJECT/g" $TMPFILE
-    sed -i -e "s/{FROM}/$FROM/g" $TMPFILE
-    sed -i -e "s/{RECVS}/$RECVS/g" $TMPFILE
-    sed -i -e "s/{BODY}/$BODY/g" $TMPFILE
-    sed -i -e "s/{FILENAME}/$FILENAME/g" $TMPFILE
-    sed -i -e "s/{ATTACHMENT}/$ATTACHMENT/g" $TMPFILE
-    sed -i -e "s/$(printf '\r')//g" $TMPFILE
+    sed -i '' -e "s/{SUBJECT}/$SUBJECT/g" $TMPFILE
+    sed -i '' -e "s/{FROM}/$FROM/g" $TMPFILE
+    sed -i '' -e "s/{RECVS}/$RECVS/g" $TMPFILE
+    sed -i '' -e "s/{BODY}/$BODY/g" $TMPFILE
+    sed -i '' -e "s/{FILENAME}/$FILENAME/g" $TMPFILE
+    sed -i '' -e "s/$(printf '\r')//g" $TMPFILE
+ 
 
     aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://$TMPFILE
 }
@@ -91,18 +94,6 @@ while :; do
         ;;
     -a|--attachment)
         ATTACHMENT=$2
-        shift
-        ;;
-    --aws-region)
-        AWS_DEFAULT_REGION=$2
-        shift
-        ;;
-    --aws_access_key_id)
-        AWS_ACCESS_KEY_ID=$2
-        shift
-        ;;
-    --aws_secret_access_key)
-        AWS_SECRET_ACCESS_KEY=$2
         shift
         ;;
     *)  # Default case: No more options, so break out of the loop.
