@@ -24,7 +24,7 @@ aws configure
 You can get help with -h or --help argument.
 
 ```
-$ sh sender.sh -h
+$ ./sender.sh -h
 
 Usage: sender.sh [-h|--help ]
         [-s|--subject <string> subject/title for email ]
@@ -32,17 +32,10 @@ Usage: sender.sh [-h|--help ]
         [-r|--receiver|--receivers <emails> coma seperated emails ]
         [-b|--body <string> ]
         [-a|--attachment <filename> filepath ]
-        [--aws-region <string> Change Default AWS Region ]
-        [--aws_access_key_id <string> Change AWS Access Key ID ]
-        [--aws_secret_access_key <string> Change AWS Secret Access Key ]
 ```
 
 ### Examples
 
 ```
 sh sender.sh -s test -f cem@domain.com -r batur@domain.com -b "mail content" -a ~/Documents/Projects/batur/test.html 
-```
-
-```
-sh sender.sh -s test -f cem@domain.com -r batur@domain.com -b "mail content" -a ~/Documents/Projects/batur/test.html --aws-region us-east-1
 ```
