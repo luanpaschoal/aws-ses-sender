@@ -37,7 +37,7 @@ Usage: sender.sh [-h|--help ]
         [--aws_secret_access_key <string> Change AWS Secret Access Key ]
 ```
 
-######Examples
+### Examples
 
 ```
 sh sender.sh -s test -f cem@domain.com -r batur@domain.com -b "mail content" -a ~/Documents/Projects/batur/test.html 
