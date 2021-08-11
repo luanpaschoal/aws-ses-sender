@@ -41,8 +41,7 @@ function checkRequirements() {
 
 function sendMail() {
     PARTA="{\"Data\": \"From: {FROM}\nTo: {RECVS}\nSubject: {SUBJECT}\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\\\"NextPart\\\"\\n\\n--NextPart\\nContent-Type: text/plain\\nContent-Transfer-Encoding: base64\\n\\n{BODY}\\n\\n--NextPart\\nContent-Type: {MIMETYPE};\\nContent-Disposition: attachment; filename=\\\"{FILENAME}\\\"\\nContent-Transfer-Encoding: base64\\n\\n"
-
-	PARTB="\\n\\n--NextPart--\"}"
+    PARTB="\\n\\n--NextPart--\"}"
 
     if [[ -z ${ATTACHMENT} ]]; then
         ATTACHMENT=$BODY
