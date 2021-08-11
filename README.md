@@ -10,7 +10,7 @@ As a Mac user, I prefer to use Homebrew (https://brew.sh/)
 brew install awscli
 ```
 
-After installing AWS Cli, you must configure the credential file. You can use this command:
+After installing AWS cli, you must configure the credential file. You can use this command:
 
 ```
 aws configure
@@ -30,8 +30,8 @@ Usage: sender.sh [-h|--help ]
         [-a|--attachment <filename> filepath ]
 ```
 
-### Examples
+### Example
 
 ```
-sh sender.sh -s test -f cem@domain.com -r batur@domain.com -b "mail content" -a ~/Documents/Projects/batur/test.html 
+./sender.sh -s test -f cem@domain.com -r batur@domain.com -b "mail content" -a ~/Documents/Projects/batur/test.html 
 ```
