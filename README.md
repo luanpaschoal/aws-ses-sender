@@ -15,9 +15,16 @@ After installing AWS cli, you must configure the credential file. You can use th
 ```
 aws configure
 ```
+
+Copy the sender.sh file to your desired directory and make the script executable:
+
+```
+chmod +x sender.sh
+```
+
 ### Usage
 
-You can get help with -h or --help argument.
+You can get help with -h or --help argument. The script will error if you don't supply any arguments.
 
 ```
 $ ./sender.sh -h
