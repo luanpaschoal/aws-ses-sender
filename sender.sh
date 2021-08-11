@@ -55,7 +55,7 @@ function sendMail() {
 
     TMPFILE="/tmp/ses-$(date +%s)"
 	
-	printf "%s" $PARTA > $TMPFILE
+    printf "%s" $PARTA > $TMPFILE
     printf "%s" $ATTACHMENT >> $TMPFILE
     printf "%s" $PARTB >> $TMPFILE
 
