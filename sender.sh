@@ -8,8 +8,7 @@
 # Removed setting aws region/id/key which can be done separately
 # Rewritten to allow for larger attachments (AWS limit is 10MB)
 # Removed the need to have a separate template file
-
-## Global vars
+# Added automatic determination of correct MIME Type for attachment
 
 function usage() {
     echo "Usage: $0 [-h|--help ]
@@ -40,17 +39,18 @@ function checkRequirements() {
     fi
 }
 
-
 function sendMail() {
-    PARTA="{\"Data\": \"From: {FROM}\nTo: {RECVS}\nSubject: {SUBJECT}\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\\\"NextPart\\\"\\n\\n--NextPart\\nContent-Type: text/plain\\nContent-Transfer-Encoding: base64\\n\\n{BODY}\\n\\n--NextPart\\nContent-Type: text/plain;\\nContent-Disposition: attachment; filename=\\\"{FILENAME}\\\"\\nContent-Transfer-Encoding: base64\\n\\n"
+    PARTA="{\"Data\": \"From: {FROM}\nTo: {RECVS}\nSubject: {SUBJECT}\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\\\"NextPart\\\"\\n\\n--NextPart\\nContent-Type: text/plain\\nContent-Transfer-Encoding: base64\\n\\n{BODY}\\n\\n--NextPart\\nContent-Type: {MIMETYPE};\\nContent-Disposition: attachment; filename=\\\"{FILENAME}\\\"\\nContent-Transfer-Encoding: base64\\n\\n"
 
 	PARTB="\\n\\n--NextPart--\"}"
 
     if [[ -z ${ATTACHMENT} ]]; then
         ATTACHMENT=$BODY
         FILENAME="Message.txt"
+        MIMETYPE="text/plain"
     else
         FILENAME=$(basename "${ATTACHMENT%}")
+        MIMETYPE=`file --mime-type $ATTACHMENT | sed 's/.*: //'`
         ATTACHMENT=`base64 -e $ATTACHMENT`
     fi
 
@@ -65,9 +65,9 @@ function sendMail() {
     sed -i '' -e "s/{RECVS}/$RECVS/g" $TMPFILE
     sed -i '' -e "s/{BODY}/$BODY/g" $TMPFILE
     sed -i '' -e "s/{FILENAME}/$FILENAME/g" $TMPFILE
-    sed -i '' -e "s/$(printf '\r')//g" $TMPFILE
+	sed -i '' -e "s!{MIMETYPE}!$MIMETYPE!g" $TMPFILE  #Use ! as delimiter because MIMETYPE has /
+    sed -i '' -e "s/$(printf '\r')//g" $TMPFILE       #Remove extraneous \r characters
  
-
     aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://$TMPFILE
 }
 
