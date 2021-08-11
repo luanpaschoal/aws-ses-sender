@@ -65,7 +65,7 @@ function sendMail() {
     sed -i '' -e "s/{RECVS}/$RECVS/g" $TMPFILE
     sed -i '' -e "s/{BODY}/$BODY/g" $TMPFILE
     sed -i '' -e "s/{FILENAME}/$FILENAME/g" $TMPFILE
-	sed -i '' -e "s!{MIMETYPE}!$MIMETYPE!g" $TMPFILE  #Use ! as delimiter because MIMETYPE has /
+    sed -i '' -e "s!{MIMETYPE}!$MIMETYPE!g" $TMPFILE  #Use ! as delimiter because MIMETYPE has /
     sed -i '' -e "s/$(printf '\r')//g" $TMPFILE       #Remove extraneous \r characters
  
     aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://$TMPFILE
