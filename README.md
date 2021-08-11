@@ -3,8 +3,8 @@ The "sender.sh" script can send an email with attachment by using Amazon SES ser
 ### Install
 
 You have to install the AWS CLI tool.
-There are many ways to install the Amazon Web Service Command Line Client (aka AWS cli) including using pip package manager, homebrew package manager or just downloading the raw executables.(http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
-As a Mac user, I prefer to use Homebrew ( https://brew.sh/ )
+There are many ways to install the Amazon Web Service Command Line Client (aka AWS cli) (http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
+As a Mac user, I prefer to use Homebrew (https://brew.sh/)
 
 ```
 brew install awscli
