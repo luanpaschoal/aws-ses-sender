@@ -5,6 +5,7 @@
 # Coder : baturorkun@hmail.com / Batur Orkun
 
 # Modifications by Alastair Bor
+# Fixed typos / non-working syntax
 # Removed setting aws region/id/key which can be done separately
 # Rewritten to allow for larger attachments (AWS limit is 10MB)
 # Removed the need to have a separate template file
