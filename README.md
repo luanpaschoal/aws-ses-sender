@@ -40,5 +40,5 @@ Usage: sender.sh [-h|--help ]
 ### Example
 
 ```
-./sender.sh -s test -f cem@domain.com -r batur@domain.com -b "mail content" -a ~/Documents/Projects/batur/test.html 
+./sender.sh -s test -f ambanmba@fakeaddress.net -r ambanmba@notmyrealmail.com -b "mail content" -a ~/Documents/Image_00001.jpg
 ```
