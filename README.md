@@ -9,10 +9,6 @@ As a Mac user, I prefer to use Homebrew ( https://brew.sh/ )
 ```
 brew install awscli
 ```
-or 
-```
-pip3 install --upgrade --user awscli
-```
 
 After installing AWS Cli, you must configure the credential file. You can use this command:
 
