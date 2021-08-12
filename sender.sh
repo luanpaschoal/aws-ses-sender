@@ -49,9 +49,9 @@ function sendMail() {
         FILENAME="Message.txt"
         MIMETYPE="text/plain"
     else
-        FILENAME=$(basename "${ATTACHMENT%}")
-        MIMETYPE=`file --mime-type $ATTACHMENT | sed 's/.*: //'`
-        ATTACHMENT=`base64 -e $ATTACHMENT`
+        FILENAME=$(basename "${ATTACHMENT}")
+        MIMETYPE=`file --mime-type "$ATTACHMENT" | sed 's/.*: //'`
+        ATTACHMENT=`base64 -e "$ATTACHMENT"`
     fi
 
     TMPFILE="/tmp/ses-$(date +%s)"
@@ -64,7 +64,7 @@ function sendMail() {
     sed -i '' -e "s/{FROM}/$FROM/g" $TMPFILE
     sed -i '' -e "s/{RECVS}/$RECVS/g" $TMPFILE
     sed -i '' -e "s/{BODY}/$BODY/g" $TMPFILE
-    sed -i '' -e "s/{FILENAME}/$FILENAME/g" $TMPFILE
+    sed -i '' -e "s/{FILENAME}/${FILENAME}/g" $TMPFILE
     sed -i '' -e "s!{MIMETYPE}!$MIMETYPE!g" $TMPFILE  #Use ! as delimiter because MIMETYPE has /
     sed -i '' -e "s/$(printf '\r')//g" $TMPFILE       #Remove extraneous \r characters
  
@@ -93,7 +93,7 @@ while :; do
         shift
         ;;
     -a|--attachment)
-        ATTACHMENT=$2
+        ATTACHMENT="$2"
         shift
         ;;
     *)  # Default case: No more options, so break out of the loop.
