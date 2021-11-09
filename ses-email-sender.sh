@@ -11,6 +11,11 @@
 # Removed the need to have a separate template file
 # Added automatic determination of correct MIME Type for attachment
 
+# Modifications by Luan Paschoal
+# charset utf-8 para acentos
+# uso direto de variaveis sem comando de replace (sed)
+# geração de arquivo tmp-message.txt para analisar msg antes de envio
+
 function usage() {
     echo "Usage: $0 [-h|--help ]
         [-s|--subject <string> subject/title for email ]
@@ -31,19 +36,16 @@ function checkRequirements() {
 
     which  aws
     if [ $? -ne 0 ]; then
-        Error "AWS cli tool is installed"
+        Error "AWS cli tool is not installed"
     fi
 
     which  base64
     if [ $? -ne 0 ]; then
-        Error "base64 tool is installed"
+        Error "base64 tool is not installed"
     fi
 }
 
 function sendMail() {
-    PARTA="{\"Data\": \"From: {FROM}\nTo: {RECVS}\nSubject: {SUBJECT}\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\\\"NextPart\\\"\\n\\n--NextPart\\nContent-Type: text/plain\\nContent-Transfer-Encoding: base64\\n\\n{BODY}\\n\\n--NextPart\\nContent-Type: {MIMETYPE};\\nContent-Disposition: attachment; filename=\\\"{FILENAME}\\\"\\nContent-Transfer-Encoding: base64\\n\\n"
-    PARTB="\\n\\n--NextPart--\"}"
-
     if [[ -z ${ATTACHMENT} ]]; then
         ATTACHMENT=$BODY
         FILENAME="Message.txt"
@@ -51,23 +53,28 @@ function sendMail() {
     else
         FILENAME=$(basename "${ATTACHMENT}")
         MIMETYPE=`file --mime-type "$ATTACHMENT" | sed 's/.*: //'`
-        ATTACHMENT=`base64 -e "$ATTACHMENT"`
+        ATTACHMENT=`base64 "$ATTACHMENT"`
     fi
 
+    PARTA="{\"Data\": \"From: $FROM\nTo: $RECVS\nSubject: {SUBJECT}\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\\\"NextPart\\\"\\n\\n--NextPart\\nContent-Type: text/plain; charset=utf-8\\nContent-Transfer-Encoding: base64\\n\\n$BODY\\n\\n--NextPart\\nContent-Type: $MIMETYPE;\\nContent-Disposition: attachment; filename=\\\"$FILENAME\\\"\\nContent-Transfer-Encoding: base64\\n\\n"
+    PARTB="\\n\\n--NextPart--\"}"
+
     TMPFILE="/tmp/ses-$(date +%s)"
-	
+
     printf "%s" $PARTA > $TMPFILE
     printf "%s" $ATTACHMENT >> $TMPFILE
     printf "%s" $PARTB >> $TMPFILE
 
     sed -i '' -e "s/{SUBJECT}/$SUBJECT/g" $TMPFILE
-    sed -i '' -e "s/{FROM}/$FROM/g" $TMPFILE
-    sed -i '' -e "s/{RECVS}/$RECVS/g" $TMPFILE
-    sed -i '' -e "s/{BODY}/$BODY/g" $TMPFILE
-    sed -i '' -e "s/{FILENAME}/${FILENAME}/g" $TMPFILE
-    sed -i '' -e "s!{MIMETYPE}!$MIMETYPE!g" $TMPFILE  #Use ! as delimiter because MIMETYPE has /
-    sed -i '' -e "s/$(printf '\r')//g" $TMPFILE       #Remove extraneous \r characters
- 
+    #sed -i '' -e "s/{FROM}/$FROM/g" $TMPFILE
+    #sed -i '' -e "s/{RECVS}/$RECVS/g" $TMPFILE
+    #sed -i '' -e "s/{BODY}/$BODY/g" $TMPFILE
+    #sed -i '' -e "s/{FILENAME}/${FILENAME}/g" $TMPFILE
+    #sed -i '' -e "s!{MIMETYPE}!$MIMETYPE!g" $TMPFILE  #Use ! as delimiter because MIMETYPE has /
+    #sed -i '' -e "s/$(printf '\r')//g" $TMPFILE       #Remove extraneous \r characters
+
+    echo "$(cat $TMPFILE)" > tmp-message.txt
+
     aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://$TMPFILE
 }
 

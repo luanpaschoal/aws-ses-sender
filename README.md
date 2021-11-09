@@ -1,13 +1,15 @@
-The "sender.sh" script can send an email with attachment by using Amazon SES services (Amazon Simple E-mail Services). It needs the AWS cli tool.
+The "ses-email-sender.sh" script can send an email with attachment by using Amazon SES services (Amazon Simple E-mail Services). It needs the AWS cli tool.
 
 ### Install
 
 You have to install the AWS CLI tool.
-There are many ways to install the Amazon Web Service Command Line Client (aka AWS cli) (http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
-As a Mac user, I prefer to use Homebrew (https://brew.sh/)
+There are many ways to install the Amazon Web Service Command Line Client (aka AWS cli) (https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
+As a Linux user:
 ```
-brew install awscli
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 ```
 
 After installing AWS cli, you must configure the credential file. You can use this command:
@@ -16,10 +18,10 @@ After installing AWS cli, you must configure the credential file. You can use th
 aws configure
 ```
 
-Copy the sender.sh file to your desired directory and make the script executable:
+Copy the ses-email-sender.sh file to your desired directory and make the script executable:
 
 ```
-chmod +x sender.sh
+chmod +x ses-email-sender.sh
 ```
 
 ### Usage
@@ -27,9 +29,9 @@ chmod +x sender.sh
 You can get help with -h or --help argument. The script will error if you don't supply any arguments.
 
 ```
-$ ./sender.sh -h
+$ ./ses-sender-email.sh -h
 
-Usage: sender.sh [-h|--help ]
+Usage: ses-email-sender.sh [-h|--help ]
         [-s|--subject <string> subject/title for email ]
         [-f|--from <email> ]
         [-r|--receiver|--receivers <emails> coma seperated emails ]
@@ -40,5 +42,5 @@ Usage: sender.sh [-h|--help ]
 ### Example
 
 ```
-./sender.sh -s test -f ambanmba@fakeaddress.net -r ambanmba@notmyrealmail.com -b "mail content" -a ~/Documents/Image_00001.jpg
+./ses-email-sender.sh -s "Relatório de Verificações XYZ" -f from@email.com.br -r receiver@email.com.br,receiver2@email.com -b "Segue em anexo relatório processado hoje." -a ./test.pdf
 ```
